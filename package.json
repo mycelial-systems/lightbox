@@ -45,14 +45,14 @@
   },
   "dependencies": {
     "@substrate-system/scroll-lock": "^0.0.4",
-    "@substrate-system/web-component": "^0.0.46"
+    "@substrate-system/web-component": "^0.0.49"
   },
   "devDependencies": {
     "@substrate-system/a11y": "^0.0.17",
     "@substrate-system/css-normalize": "^0.0.13",
     "@substrate-system/debug": "^0.9.32",
     "@substrate-system/dom": "^0.1.13",
-    "@substrate-system/tapout": "^0.0.35",
+    "@substrate-system/tapout": "^0.0.37",
     "@substrate-system/tapzero": "^0.10.15",
     "@typescript-eslint/eslint-plugin": "^8.7.0",
     "@typescript-eslint/parser": "^8.7.0",
@@ -70,7 +70,7 @@
     "tape-run": "^11.0.0",
     "typedoc": "^0.28.1",
     "typescript": "^5.7.3",
-    "vite": "^7.3.0"
+    "vite": "^8.0.1"
   },
   "keywords": [
     "lightbox",
