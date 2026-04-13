@@ -10,6 +10,7 @@ if (import.meta.env.DEV) {
 
 /**
  * FOUCE
+ * @see https://www.abeautifulsite.net/posts/flash-of-undefined-custom-elements/#awaiting-customelements.whendefined
  */
 (async () => {
     await Promise.race([
