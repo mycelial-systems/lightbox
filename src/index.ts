@@ -220,6 +220,14 @@ export class LightBox extends WebComponent.create('light-box') {
             <div class="light-box-backdrop" data-light-box-backdrop></div>
             <div class="light-box-stage">
                 <button
+                    class="light-box-close"
+                    type="button"
+                    data-light-box-close
+                >
+                    <span aria-hidden="true">&times;</span>
+                    <span class="visually-hidden">Close lightbox</span>
+                </button>
+                <button
                     class="light-box-control light-box-prev"
                     type="button"
                     data-light-box-prev
@@ -235,14 +243,6 @@ export class LightBox extends WebComponent.create('light-box') {
                 >
                     <span aria-hidden="true">&rsaquo;</span>
                     <span class="visually-hidden">Next image</span>
-                </button>
-                <button
-                    class="light-box-close"
-                    type="button"
-                    data-light-box-close
-                >
-                    <span aria-hidden="true">&times;</span>
-                    <span class="visually-hidden">Close lightbox</span>
                 </button>
                 <p class="light-box-counter" aria-live="polite" data-light-box-counter></p>
             </div>
@@ -348,6 +348,7 @@ export class LightBox extends WebComponent.create('light-box') {
             this.overlay.classList.add(OVERLAY_OPEN_CLASS)
             this.applyRect(this.stageImage, toRect)
             this.stageImage.style.opacity = '1'
+            this.closeButton?.focus()
             return
         }
 
@@ -364,6 +365,7 @@ export class LightBox extends WebComponent.create('light-box') {
         if (token !== this.animationToken) return
         this.stageImage.style.transition = ''
         this.backdrop.style.transition = ''
+        this.closeButton?.focus()
     }
 
     async close (reason?:CloseReason):Promise<void> {

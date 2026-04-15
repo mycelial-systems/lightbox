@@ -64,6 +64,52 @@ test('open and close overlay', async t => {
         'should hide overlay after pressing Escape')
 })
 
+test('focus close button first and tab order is close, prev, next', async t => {
+    document.body.innerHTML = `
+        <light-box class="test-gallery">
+            <img src="${IMG_DATA}" alt="image one" />
+            <img src="${IMG_DATA}" alt="image two" />
+        </light-box>
+    `
+
+    const el = await waitFor('light-box')
+    t.ok(el, 'should find light-box before interaction')
+    if (!el) return
+
+    const firstImage = el.querySelector('img')!
+    click(firstImage)
+    // Wait for transition animation (300ms) to complete so focus is set
+    await wait(350)
+
+    const closeButton = document.querySelector('[data-light-box-close]')
+    const prevButton = document.querySelector('[data-light-box-prev]')
+    const nextButton = document.querySelector('[data-light-box-next]')
+
+    t.ok(closeButton, 'should have close button')
+    t.ok(prevButton, 'should have prev button')
+    t.ok(nextButton, 'should have next button')
+
+    t.equal(document.activeElement, closeButton,
+        'close button should be focused initially')
+
+    // Verify DOM order is close → prev → next for natural tab flow
+    const stage = document.querySelector('.light-box-stage')
+    const buttons = stage?.querySelectorAll('button')
+    t.equal(buttons?.[0], closeButton,
+        'close button should be first in DOM order')
+    t.equal(buttons?.[1], prevButton,
+        'prev button should be second in DOM order')
+    t.equal(buttons?.[2], nextButton,
+        'next button should be third in DOM order')
+
+    // cleanup
+    document.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'Escape',
+        bubbles: true
+    }))
+    await wait(320)
+})
+
 test('close overlay on backdrop click', async t => {
     document.body.innerHTML = `
         <light-box class="test-gallery">
