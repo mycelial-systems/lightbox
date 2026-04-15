@@ -1,7 +1,7 @@
 import { test } from '@substrate-system/tapzero'
 import { waitFor, click } from '@substrate-system/dom'
 import { wait } from './util.js'
-import '../src/index.js'
+import { LightBox } from '../src/index.js'
 
 const IMG_DATA = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=='
 
@@ -94,6 +94,200 @@ test('close overlay on backdrop click', async t => {
 
     t.ok(!overlay?.classList.contains('is-visible'),
         'should hide overlay after backdrop click')
+})
+
+test('emit open event', async t => {
+    document.body.innerHTML = `
+        <light-box class="test-gallery">
+            <img src="${IMG_DATA}" alt="image one" />
+        </light-box>
+    `
+
+    const el = await waitFor('light-box') as LightBox | null
+    t.ok(el, 'should find light-box')
+    if (!el) return
+
+    let openFired = false
+    let namespacedOpenFired = false
+
+    el.addEventListener('open', () => {
+        openFired = true
+    })
+
+    el.addEventListener(LightBox.event('open'), () => {
+        namespacedOpenFired = true
+    })
+
+    const firstImage = el.querySelector('img')!
+    click(firstImage)
+    await wait(20)
+
+    t.ok(openFired, 'should fire non-namespaced open event')
+    t.ok(namespacedOpenFired, 'should fire namespaced open event')
+
+    // cleanup
+    document.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'Escape',
+        bubbles: true
+    }))
+    await wait(320)
+})
+
+test('emit close event with reason for escape', async t => {
+    document.body.innerHTML = `
+        <light-box class="test-gallery">
+            <img src="${IMG_DATA}" alt="image one" />
+        </light-box>
+    `
+
+    const el = await waitFor('light-box') as LightBox | null
+    t.ok(el, 'should find light-box')
+    if (!el) return
+
+    const firstImage = el.querySelector('img')!
+    click(firstImage)
+    await wait(20)
+
+    let closeReason:string | undefined
+    let namespacedCloseReason:string | undefined
+
+    el.addEventListener('close', ((ev:CustomEvent) => {
+        closeReason = ev.detail?.reason
+    }) as EventListener)
+
+    el.addEventListener(LightBox.event('close'), ((ev:CustomEvent) => {
+        namespacedCloseReason = ev.detail?.reason
+    }) as EventListener)
+
+    document.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'Escape',
+        bubbles: true
+    }))
+    await wait(320)
+
+    t.equal(closeReason, 'escape',
+        'should include escape reason in non-namespaced close event')
+    t.equal(namespacedCloseReason, 'escape',
+        'should include escape reason in namespaced close event')
+})
+
+test('emit close event with reason for button-click', async t => {
+    document.body.innerHTML = `
+        <light-box class="test-gallery">
+            <img src="${IMG_DATA}" alt="image one" />
+        </light-box>
+    `
+
+    const el = await waitFor('light-box') as LightBox | null
+    t.ok(el, 'should find light-box')
+    if (!el) return
+
+    const firstImage = el.querySelector('img')!
+    click(firstImage)
+    await wait(20)
+
+    let closeReason:string | undefined
+
+    el.addEventListener('close', ((ev:CustomEvent) => {
+        closeReason = ev.detail?.reason
+    }) as EventListener)
+
+    const closeBtn = document.querySelector('[data-light-box-close]')
+    t.ok(closeBtn, 'should have close button')
+    closeBtn?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    await wait(320)
+
+    t.equal(closeReason, 'button-click',
+        'should include button-click reason in close event')
+})
+
+test('emit close event with reason for background-click', async t => {
+    document.body.innerHTML = `
+        <light-box class="test-gallery">
+            <img src="${IMG_DATA}" alt="image one" />
+        </light-box>
+    `
+
+    const el = await waitFor('light-box') as LightBox | null
+    t.ok(el, 'should find light-box')
+    if (!el) return
+
+    const firstImage = el.querySelector('img')!
+    click(firstImage)
+    await wait(20)
+
+    let closeReason:string | undefined
+
+    el.addEventListener('close', ((ev:CustomEvent) => {
+        closeReason = ev.detail?.reason
+    }) as EventListener)
+
+    const backdrop = document.querySelector('[data-light-box-backdrop]')
+    t.ok(backdrop, 'should have backdrop')
+    backdrop?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    await wait(320)
+
+    t.equal(closeReason, 'background-click',
+        'should include background-click reason in close event')
+})
+
+test('preventDefault stops open', async t => {
+    document.body.innerHTML = `
+        <light-box class="test-gallery">
+            <img src="${IMG_DATA}" alt="image one" />
+        </light-box>
+    `
+
+    const el = await waitFor('light-box') as LightBox | null
+    t.ok(el, 'should find light-box')
+    if (!el) return
+
+    el.addEventListener('open', (ev) => {
+        ev.preventDefault()
+    })
+
+    const firstImage = el.querySelector('img')!
+    click(firstImage)
+    await wait(20)
+
+    const overlay = document.querySelector('.light-box-overlay')
+    t.ok(!overlay, 'should not create overlay when open is prevented')
+})
+
+test('preventDefault stops close', async t => {
+    document.body.innerHTML = `
+        <light-box class="test-gallery">
+            <img src="${IMG_DATA}" alt="image one" />
+        </light-box>
+    `
+
+    const el = await waitFor('light-box') as LightBox | null
+    t.ok(el, 'should find light-box')
+    if (!el) return
+
+    const firstImage = el.querySelector('img')!
+    click(firstImage)
+    await wait(20)
+
+    const overlay = document.querySelector('.light-box-overlay')
+    t.ok(overlay?.classList.contains('is-visible'),
+        'should show overlay before close attempt')
+
+    el.addEventListener('close', (ev) => {
+        ev.preventDefault()
+    })
+
+    document.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'Escape',
+        bubbles: true
+    }))
+    await wait(320)
+
+    t.ok(overlay?.classList.contains('is-visible'),
+        'should keep overlay visible when close is prevented')
+
+    // cleanup: remove the preventing listener and close normally
+    el.replaceWith(el.cloneNode(true))
 })
 
 test('all done', () => {

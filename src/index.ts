@@ -6,6 +6,8 @@ import {
 import Debug from '@substrate-system/debug'
 const debug = Debug('lightbox')
 
+export type CloseReason = 'escape' | 'button-click' | 'background-click'
+
 type GalleryItem = {
     thumb:HTMLImageElement
     src:string
@@ -83,7 +85,7 @@ export class LightBox extends WebComponent.create('light-box') {
 
         if (event.key === 'Escape') {
             event.preventDefault()
-            this.close()
+            this.close('escape')
             return
         }
 
@@ -101,18 +103,18 @@ export class LightBox extends WebComponent.create('light-box') {
 
     private readonly onBackdropClick = ():void => {
         debug('backdrop click...')
-        this.close()
+        this.close('background-click')
     }
 
     private readonly onStageClick = (event:MouseEvent):void => {
         if (event.target !== this.stage) return
         debug('stage click...')
-        this.close()
+        this.close('background-click')
     }
 
     private readonly onCloseClick = (event:MouseEvent):void => {
         event.preventDefault()
-        this.close()
+        this.close('button-click')
     }
 
     private readonly onPrevClick = (event:MouseEvent):void => {
@@ -302,6 +304,10 @@ export class LightBox extends WebComponent.create('light-box') {
         const normalized = this.normalizeIndex(index)
         if (normalized < 0) return
 
+        const dispatchAllowed = this.dispatch('open', { cancelable: true })
+        const emitAllowed = this.emit('open', { cancelable: true })
+        if (!dispatchAllowed || !emitAllowed) return
+
         this.ensureOverlay()
         if (!this.overlay || !this.backdrop || !this.stageImage) return
 
@@ -360,10 +366,21 @@ export class LightBox extends WebComponent.create('light-box') {
         this.backdrop.style.transition = ''
     }
 
-    async close ():Promise<void> {
+    async close (reason?:CloseReason):Promise<void> {
         if (
             !this.isOpen || this.activeIndex < 0 || !this.overlay || !this.stageImage
         ) return
+
+        const detail = reason ? { reason } : undefined
+        const dispatchAllowed = this.dispatch('close', {
+            cancelable: true,
+            detail
+        })
+        const emitAllowed = this.emit('close', {
+            cancelable: true,
+            detail
+        })
+        if (!dispatchAllowed || !emitAllowed) return
 
         const token = ++this.animationToken
         const active = this.items[this.activeIndex]
