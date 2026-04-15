@@ -10,10 +10,6 @@ button {
     cursor: pointer;
 }
 
-html.reduce-fouce {
-    opacity: 0;
-}
-
 main {
     margin: 2rem auto;
     max-width: 70rem;

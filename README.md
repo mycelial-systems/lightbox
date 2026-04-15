@@ -26,6 +26,7 @@ Lightbox web component.
 - [CSS](#css)
   * [Import CSS](#import-css)
 - [Example](#example)
+  * [Note FOUCE Script](#note-fouce-script)
   * [JS](#js)
   * [HTML](#html)
 - [pre-built](#pre-built)
@@ -94,6 +95,13 @@ import '@substrate-system/lightbox/min/css'
 
 This calls the global function `customElements.define`. Just import, then use
 the tag in your HTML. See [./example](./example/).
+
+### Note FOUCE Script
+
+[In the example](./example/index.ts#L16), we use a robust
+[FOUCE script](https://www.abeautifulsite.net/posts/flash-of-undefined-custom-elements/#awaiting-customelements.whendefined).
+It waits for all images to download, the animation to finish, and the custom
+element to be defined.
 
 ### JS
 

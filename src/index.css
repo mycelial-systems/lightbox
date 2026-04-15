@@ -1,5 +1,10 @@
 @import url("@substrate-system/a11y");
 
+:root {
+    --lb-control-color: #fffffff2;
+    --lb-bgc: #00000038;
+}
+
 @supports (scrollbar-gutter: stable) {
     .scroll-lock {
         scrollbar-gutter: var(--scroll-lock-gutter)!important;
@@ -76,8 +81,8 @@ light-box img[data-light-box-thumb] {
     padding: 0;
     display: grid;
     place-items: center;
-    color: #fffffff2;
-    background: #00000038;
+    color: var(--lb-control-color, #fffffff2);
+    background: var(--lb-bgc, #00000038);
     cursor: pointer;
     line-height: 1;
     transition: background-color 120ms ease;
@@ -89,14 +94,18 @@ light-box img[data-light-box-thumb] {
     margin-top: -32px;
     font-size: 42px;
     border-radius: 12px;
+    transition: all 0.2s;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
 
     &:hover {
-        background: #00000057;
+        background: black;
     }
 
-    &:focus-visible {
+    &:focus, &:focus-visible {
         outline: 2px solid #d5d9ff;
         outline-offset: 2px;
+        background-color: black;
     }
 
     & > span {
