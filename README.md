@@ -21,6 +21,8 @@ Lightbox web component.
 - [API](#api)
   * [ESM](#esm)
   * [Common JS](#common-js)
+- [Events](#events)
+- [Attributes](#attributes)
 - [CSS](#css)
   * [Import CSS](#import-css)
 - [Example](#example)
@@ -56,6 +58,24 @@ import '@substrate-system/lightbox'
 ```js
 require('@substrate-system/lightbox')
 ```
+
+## Events
+
+This component does not dispatch custom events.
+
+For programmatic control, call methods on the element instance:
+
+`open(index)`, `close()`, `showNext()`, `showPrevious()`.
+
+## Attributes
+
+`light-box` does not currently define attributes.
+
+Child images support:
+
+- `data-lightbox-src` Optional. Use a different URL for the overlay image
+  than the thumbnail `src`/`currentSrc`.
+- `alt` Recommended. Used for the overlay image `alt` text.
 
 ## CSS
 
